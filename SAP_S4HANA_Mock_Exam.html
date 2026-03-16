@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAP S/4HANA Mock Exam – Week 1</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --border: #dddbd4;
+    --text: #1a1a18;
+    --muted: #6b6a65;
+    --accent: #0057b8;
+    --accent-light: #e6f0fb;
+    --green: #0f6e44;
+    --green-light: #e2f5ec;
+    --red: #b82500;
+    --red-light: #fceee9;
+    --amber: #7a4800;
+    --amber-light: #fff3dc;
+    --radius: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .page {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  /* Header */
+  .header {
+    border-bottom: 2px solid var(--text);
+    padding-bottom: 1.25rem;
+    margin-bottom: 2rem;
+  }
+  .header-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: .4rem;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -.02em;
+    margin-bottom: .3rem;
+  }
+  .header-meta {
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-top: .5rem;
+  }
+  .header-meta span::before { content: '— '; }
+
+  /* Progress bar */
+  .progress-wrap {
+    background: var(--border);
+    border-radius: 99px;
+    height: 4px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 4px;
+    background: var(--accent);
+    border-radius: 99px;
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .progress-label {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    margin-bottom: .4rem;
+  }
+
+  /* Section divider */
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2.5rem 0 1rem;
+  }
+  .section-head h2 {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* Question card */
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.25rem;
+    margin-bottom: .6rem;
+    transition: border-color .15s;
+  }
+  .q-card:hover { border-color: #bbb; }
+  .q-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: .35rem;
+    letter-spacing: .04em;
+  }
+  .q-text {
+    font-size: 14.5px;
+    font-weight: 500;
+    line-height: 1.55;
+    margin-bottom: .85rem;
+    color: var(--text);
+  }
+
+  /* MC Options */
+  .opts { display: flex; flex-direction: column; gap: .35rem; }
+  .opt-label {
+    display: flex;
+    align-items: flex-start;
+    gap: .65rem;
+    cursor: pointer;
+    padding: .45rem .6rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    transition: background .12s, border-color .12s;
+  }
+  .opt-label:hover { background: var(--accent-light); border-color: #aac5e8; }
+  .opt-label input[type=radio] { margin-top: 3px; accent-color: var(--accent); flex-shrink: 0; }
+  .opt-letter {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    min-width: 16px;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+  .opt-text { font-size: 14px; line-height: 1.5; }
+  .opt-label.opt-correct { background: var(--green-light); border-color: var(--green); }
+  .opt-label.opt-correct .opt-text, .opt-label.opt-correct .opt-letter { color: var(--green); }
+  .opt-label.opt-wrong { background: var(--red-light); border-color: var(--red); }
+  .opt-label.opt-wrong .opt-text, .opt-label.opt-wrong .opt-letter { color: var(--red); }
+
+  /* Identification */
+  .id-field {
+    width: 100%;
+    padding: .5rem .75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color .15s;
+  }
+  .id-field:focus { border-color: var(--accent); background: var(--accent-light); }
+  .id-field.id-correct { background: var(--green-light); border-color: var(--green); color: var(--green); }
+  .id-field.id-wrong { background: var(--red-light); border-color: var(--red); color: var(--red); }
+  .id-hint { font-size: 12px; margin-top: .3rem; display: none; }
+  .id-hint.show { display: block; }
+  .id-hint.ok { color: var(--green); }
+  .id-hint.no { color: var(--red); }
+
+  /* True/False */
+  .tf-row { display: flex; gap: .5rem; }
+  .tf-btn {
+    flex: 1;
+    padding: .45rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text);
+    transition: .12s;
+  }
+  .tf-btn:hover { background: var(--accent-light); border-color: #aac5e8; }
+  .tf-btn.sel-t { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+  .tf-btn.sel-f { background: var(--amber-light); border-color: var(--amber); color: var(--amber); }
+  .tf-btn.tf-ok { background: var(--green-light); border-color: var(--green); color: var(--green); }
+  .tf-btn.tf-no { background: var(--red-light); border-color: var(--red); color: var(--red); }
+  .tf-hint { font-size: 12px; margin-top: .3rem; display: none; }
+  .tf-hint.show { display: block; }
+  .tf-hint.ok { color: var(--green); }
+  .tf-hint.no { color: var(--red); }
+
+  /* Bottom bar */
+  .bottom-bar {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .btn-submit {
+    padding: .65rem 1.75rem;
+    background: var(--text);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  .btn-submit:hover { opacity: .85; }
+  .btn-reset {
+    padding: .65rem 1.25rem;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: .15s;
+  }
+  .btn-reset:hover { border-color: #999; color: var(--text); }
+
+  /* Score */
+  .score-box {
+    display: none;
+    margin-top: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    text-align: center;
+  }
+  .score-box.show { display: block; }
+  .score-fraction {
+    font-size: 42px;
+    font-weight: 600;
+    letter-spacing: -.03em;
+    color: var(--text);
+  }
+  .score-pct {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: .2rem;
+  }
+  .score-grade {
+    margin-top: .75rem;
+    font-size: 15px;
+    font-weight: 500;
+    padding: .4rem 1rem;
+    border-radius: 99px;
+    display: inline-block;
+  }
+  .grade-a { background: var(--green-light); color: var(--green); }
+  .grade-b { background: var(--accent-light); color: var(--accent); }
+  .grade-c { background: var(--amber-light); color: var(--amber); }
+  .grade-d { background: var(--red-light); color: var(--red); }
+  .score-note { font-size: 13px; color: var(--muted); margin-top: .6rem; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="header-tag">Mock Examination</div>
+    <h1>Introduction to SAP S/4HANA</h1>
+    <div class="header-meta">
+      <span>Week 1 Module</span>
+      <span>40 Items</span>
+      <span>Multiple Choice · Identification · True or False</span>
+    </div>
+  </div>
+
+  <div class="progress-label" id="prog-label">0 of 40 answered</div>
+  <div class="progress-wrap"><div class="progress-bar" id="prog-bar"></div></div>
+
+  <div id="exam-body"></div>
+
+  <div class="bottom-bar">
+    <button class="btn-submit" onclick="submitExam()">Submit Exam</button>
+    <button class="btn-reset" onclick="resetExam()">Reset</button>
+  </div>
+
+  <div class="score-box" id="score-box">
+    <div class="score-fraction" id="s-frac"></div>
+    <div class="score-pct" id="s-pct"></div>
+    <div class="score-grade" id="s-grade"></div>
+    <div class="score-note">Scroll up to review highlighted answers.</div>
+  </div>
+
+</div>
+
+<script>
+const Q = [
+  // MULTIPLE CHOICE
+  { s:"Part I — Multiple Choice (20 items)", t:"mc", q:"What does SAP S/4HANA represent in terms of its product generation?", o:["Second generation ERP system","Next generation Business Suite","Legacy enterprise platform","Cloud-exclusive ERP solution"], a:1 },
+  { t:"mc", q:"In which year was SAP S/4HANA officially introduced?", o:["2002","2009","2013","2015"], a:3 },
+  { t:"mc", q:"Which user interface does SAP S/4HANA primarily use for its modern design?", o:["SAP GUI","SAP NetWeaver Portal","SAP Fiori","SAP Web IDE"], a:2 },
+  { t:"mc", q:"What type of database powers SAP S/4HANA's in-memory processing?", o:["Oracle DB","Microsoft SQL Server","IBM DB2","SAP HANA"], a:3 },
+  { t:"mc", q:"Which of the following is NOT one of the three main data types in an ERP system as covered in the module?", o:["Organizational Data","Master Data","Analytical Data","Transaction Data"], a:2 },
+  { t:"mc", q:"Which SAP module abbreviation corresponds to Sales and Distribution?", o:["MM","FI","SD","CO"], a:2 },
+  { t:"mc", q:"What does ERP stand for?", o:["Electronic Reporting Platform","Enterprise Risk Planning","Enterprise Resource Planning","Extended Resource Processing"], a:2 },
+  { t:"mc", q:"Which of the following is a classic example of Master Data in SAP?", o:["Sales Order","Customer Master","Purchase Order","Accounting Document"], a:1 },
+  { t:"mc", q:"In SAP's organizational hierarchy, which unit sits at the highest level?", o:["Company Code","Plant","Storage Location","Client"], a:3 },
+  { t:"mc", q:"Which SAP Fiori application type provides a visual overview of business data?", o:["Transactional App","Factsheet","Analytical App","Configuration App"], a:2 },
+  { t:"mc", q:"Which of the three transition approaches to SAP S/4HANA is also known as the 'greenfield' approach?", o:["System Conversion","Landscape Transformation","New Implementation","Selective Migration"], a:2 },
+  { t:"mc", q:"What tool is used for New Implementation (On-Premise) data migration?", o:["SAP Landscape Transformation (SAP LT)","SAP Data Services (SAP DS)","SAP Fiori Launchpad","SAP NetWeaver"], a:1 },
+  { t:"mc", q:"Which Cloud Edition benefit is highlighted compared to the On-Premise edition?", o:["Private control of deployment and maintenance","Traditional ABAP extensibility up to core modification","Automatic participation in quarterly innovation upgrades","Fewer release cycles"], a:2 },
+  { t:"mc", q:"The document flow in SAP allows which of the following?", o:["Direct migration of legacy system data","Setting the status of a transaction at any point in time","Automatic data compression of master records","Real-time collaboration with external vendors"], a:1 },
+  { t:"mc", q:"Which optimization lever focuses on accelerating execution and automating process steps?", o:["Effectiveness","Agility","Simplification","Efficiency"], a:3 },
+  { t:"mc", q:"SAP was founded in which year?", o:["1969","1972","1981","1986"], a:1 },
+  { t:"mc", q:"After data compression in S/4HANA, a typical booking transaction that previously addressed 15 tables now impacts how many tables?", o:["2","4","6","8"], a:1 },
+  { t:"mc", q:"Which S/4HANA architecture component serves as the user-facing launchpad for accessing all applications?", o:["SAP HANA Platform","Virtual Data Model (CDS)","Fiori Launchpad","S/4HANA Core Tables"], a:2 },
+  { t:"mc", q:"Which of the following correctly describes Transaction Data?", o:["Stored permanently and rarely changed","The system record of a business event","Defines the company's organizational structure","The UI configuration layer of SAP"], a:1 },
+  { t:"mc", q:"What was launched in 2009 that focused on optimizing business performance and reducing IT costs?", o:["SAP R/3","SAP ERP","Business Suite 7","SAP S/4HANA"], a:2 },
+
+  // IDENTIFICATION
+  { s:"Part II — Identification (10 items)", t:"id", q:"This SAP module, abbreviated 'PP', is responsible for this core manufacturing function.", a:"Production Planning" },
+  { t:"id", q:"This is the term for the in-memory database platform that is the technological foundation of SAP S/4HANA.", a:"SAP HANA" },
+  { t:"id", q:"Master data that is stored for a long time and seldom changed — what is the specific type of master data that stores supplier information?", a:"Vendor Master" },
+  { t:"id", q:"This SAP Fiori application type lets users view essential information about objects and navigate contextually between related objects.", a:"Factsheet" },
+  { t:"id", q:"This transition approach is used when a customer wants to convert their existing SAP ERP system into S/4HANA in one step — database, NetWeaver, and application together.", a:"System Conversion" },
+  { t:"id", q:"This is the name given to the data model layer in S/4HANA architecture that sits above the core tables and enables flexible, virtual data access.", a:"Virtual Data Model" },
+  { t:"id", q:"The three optimization levers in SAP S/4HANA are Efficiency, Agility, and this third lever.", a:"Effectiveness" },
+  { t:"id", q:"This SAP Fiori application type gives users access to tasks like creating, changing, or displaying processes with guided navigation.", a:"Transactional App" },
+  { t:"id", q:"In SAP's organizational terminology, a 'Division' corresponds to this real-world business concept.", a:"Business Area" },
+  { t:"id", q:"SAP describes S/4HANA as the 'digital core' of a company that enables this broader business transformation.", a:"Digital Transformation" },
+
+  // TRUE OR FALSE
+  { s:"Part III — True or False (10 items)", t:"tf", q:"SAP S/4HANA is considered the biggest innovation since SAP R/3.", a:true },
+  { t:"tf", q:"In SAP S/4HANA, master data such as customer and vendor information is managed centrally.", a:true },
+  { t:"tf", q:"The On-Premise edition of SAP S/4HANA uses subscription licensing managed entirely by SAP.", a:false },
+  { t:"tf", q:"SAP Fiori is hardware-independent and fully supports mobile devices.", a:true },
+  { t:"tf", q:"System Conversion allows migration to S/4HANA without requiring a full reimplementation.", a:true },
+  { t:"tf", q:"SAP's traditional database architecture used a denormalized data model as its primary design principle.", a:false },
+  { t:"tf", q:"In S/4HANA's simplified data model, aggregation and analytics are processed on the fly rather than stored in separate aggregate tables.", a:true },
+  { t:"tf", q:"SAP currently has customers in more than 190 countries worldwide.", a:true },
+  { t:"tf", q:"The SAP Fiori Analytical App is used specifically for creating, changing, and displaying business transactions.", a:false },
+  { t:"tf", q:"Cloud and On-Premise deployments of S/4HANA can be used in a hybrid manner without losing the company's integration.", a:true },
+];
+
+let ans = {};
+let submitted = false;
+
+function updateProgress() {
+  const n = Object.keys(ans).length;
+  document.getElementById('prog-label').textContent = n + ' of 40 answered';
+  document.getElementById('prog-bar').style.width = Math.round((n/40)*100) + '%';
+}
+
+function buildExam() {
+  const body = document.getElementById('exam-body');
+  body.innerHTML = '';
+  let qNum = 1;
+  let curSection = '';
+  Q.forEach((q, i) => {
+    if (q.s && q.s !== curSection) {
+      curSection = q.s;
+      const parts = curSection.split('(');
+      const title = parts[0].trim();
+      const count = parts[1] ? '(' + parts[1] : '';
+      body.insertAdjacentHTML('beforeend',
+        `<div class="section-head"><h2>${title}</h2><div class="section-line"></div><span class="section-count">${count.replace(')','')}</span></div>`
+      );
+    }
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.id = 'card-' + i;
+    let html = `<div class="q-num">Q${qNum++}</div><div class="q-text">${q.q}</div>`;
+
+    if (q.t === 'mc') {
+      html += `<div class="opts">`;
+      q.o.forEach((opt, oi) => {
+        const letters = ['A','B','C','D'];
+        html += `<label class="opt-label" id="opt-${i}-${oi}">
+          <input type="radio" name="q${i}" value="${oi}" onchange="recordMC(${i},${oi})">
+          <span class="opt-letter">${letters[oi]}</span>
+          <span class="opt-text">${opt}</span>
+        </label>`;
+      });
+      html += `</div>`;
+    } else if (q.t === 'id') {
+      html += `<input class="id-field" id="idf-${i}" type="text" placeholder="Write your answer here…" oninput="recordID(${i},this.value)">
+               <div class="id-hint" id="idh-${i}"></div>`;
+    } else if (q.t === 'tf') {
+      html += `<div class="tf-row">
+        <button class="tf-btn" id="tf-${i}-t" onclick="recordTF(${i},true)">True</button>
+        <button class="tf-btn" id="tf-${i}-f" onclick="recordTF(${i},false)">False</button>
+      </div>
+      <div class="tf-hint" id="tfh-${i}"></div>`;
+    }
+    card.innerHTML = html;
+    body.appendChild(card);
+  });
+}
+
+function recordMC(i, oi) {
+  if (submitted) return;
+  ans[i] = oi;
+  updateProgress();
+}
+function recordID(i, val) {
+  if (submitted) return;
+  if (val.trim()) ans[i] = val.trim();
+  else delete ans[i];
+  updateProgress();
+}
+function recordTF(i, val) {
+  if (submitted) return;
+  ans[i] = val;
+  document.getElementById(`tf-${i}-t`).className = 'tf-btn' + (val ? ' sel-t' : '');
+  document.getElementById(`tf-${i}-f`).className = 'tf-btn' + (!val ? ' sel-f' : '');
+  updateProgress();
+}
+
+function normalize(s) {
+  return (s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/,' ').trim();
+}
+function idMatch(user, correct) {
+  const u = normalize(user), c = normalize(correct);
+  if (u === c) return true;
+  const cWords = c.split(' ').filter(w => w.length > 3);
+  const matchCount = cWords.filter(w => u.includes(w)).length;
+  return matchCount >= Math.ceil(cWords.length * 0.6);
+}
+
+function submitExam() {
+  submitted = true;
+  let score = 0;
+
+  Q.forEach((q, i) => {
+    const userAns = ans[i];
+    if (q.t === 'mc') {
+      const correct = (userAns === q.a);
+      if (correct) score++;
+      for (let oi = 0; oi < q.o.length; oi++) {
+        const el = document.getElementById(`opt-${i}-${oi}`);
+        if (!el) continue;
+        if (oi === q.a) el.className = 'opt-label opt-correct';
+        else if (oi === userAns && !correct) el.className = 'opt-label opt-wrong';
+      }
+    } else if (q.t === 'id') {
+      const el = document.getElementById(`idf-${i}`);
+      const hint = document.getElementById(`idh-${i}`);
+      const correct = userAns !== undefined && idMatch(userAns, q.a);
+      if (correct) {
+        score++;
+        if (el) el.className = 'id-field id-correct';
+        if (hint) { hint.textContent = '✓ Correct!'; hint.className = 'id-hint show ok'; }
+      } else {
+        if (el) el.className = 'id-field id-wrong';
+        if (hint) { hint.textContent = 'Answer: ' + q.a; hint.className = 'id-hint show no'; }
+      }
+    } else if (q.t === 'tf') {
+      const correct = (userAns === q.a);
+      if (correct) score++;
+      const tBtn = document.getElementById(`tf-${i}-t`);
+      const fBtn = document.getElementById(`tf-${i}-f`);
+      const hint = document.getElementById(`tfh-${i}`);
+      if (tBtn) tBtn.className = 'tf-btn' + (q.a ? ' tf-ok' : (userAns === true ? ' tf-no' : ''));
+      if (fBtn) fBtn.className = 'tf-btn' + (!q.a ? ' tf-ok' : (userAns === false ? ' tf-no' : ''));
+      if (hint) {
+        if (userAns === undefined) { hint.textContent = 'Answer: ' + (q.a ? 'True' : 'False'); hint.className = 'tf-hint show no'; }
+        else if (!correct) { hint.textContent = 'Correct answer: ' + (q.a ? 'True' : 'False'); hint.className = 'tf-hint show no'; }
+        else { hint.textContent = '✓ Correct!'; hint.className = 'tf-hint show ok'; }
+      }
+    }
+  });
+
+  const pct = Math.round((score / 40) * 100);
+  let grade, gradeClass;
+  if (pct >= 90) { grade = 'Outstanding — Excellent work!'; gradeClass = 'grade-a'; }
+  else if (pct >= 80) { grade = 'Very Good — Strong understanding!'; gradeClass = 'grade-b'; }
+  else if (pct >= 70) { grade = 'Good — Almost there!'; gradeClass = 'grade-b'; }
+  else if (pct >= 60) { grade = 'Satisfactory — Keep studying!'; gradeClass = 'grade-c'; }
+  else { grade = 'Needs Improvement — Review the module.'; gradeClass = 'grade-d'; }
+
+  document.getElementById('s-frac').textContent = score + ' / 40';
+  document.getElementById('s-pct').textContent = pct + '% score';
+  const gradeEl = document.getElementById('s-grade');
+  gradeEl.textContent = grade;
+  gradeEl.className = 'score-grade ' + gradeClass;
+  const box = document.getElementById('score-box');
+  box.className = 'score-box show';
+  box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function resetExam() {
+  ans = {};
+  submitted = false;
+  buildExam();
+  updateProgress();
+  document.getElementById('score-box').className = 'score-box';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+buildExam();
+updateProgress();
+</script>
+</body>
+</html>
